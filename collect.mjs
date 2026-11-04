@@ -34,8 +34,11 @@ export async function collect(id='9216') {
       else if(await ready('NOTIFY ME') || await ready('NOTIFY ME WHEN AVAILABLE')) output.observations.online='sold_out';
     } else if(await ready('Store Pickup')) output.observations.online='not_offered';
     await page.screenshot({path:`evidence/${id}-online.png`});
-    if(await ready('Switch Store')) await page.getByRole('button',{name:'Switch Store',exact:true}).click();
-    else if(await ready('Store Pickup')) await page.getByRole('button',{name:'Store Pickup',exact:true}).click();
+    // The page can reopen pickup automatically after its async hydration.
+    if(!await dialog.isVisible()) {
+      if(await ready('Switch Store')) await page.getByRole('button',{name:'Switch Store',exact:true}).click();
+      else if(await ready('Store Pickup')) await page.getByRole('button',{name:'Store Pickup',exact:true}).click();
+    }
     await dialog.waitFor({state:'visible'});
     const filter=dialog.getByRole('switch',{name:'Only Show In-stock Stores',exact:true});
     await filter.setChecked(false);
