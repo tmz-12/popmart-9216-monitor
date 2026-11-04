@@ -1,0 +1,23 @@
+name: POP MART cloud readability pilot (no notifications)
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  read-public-pages:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run pilot
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: popmart-readability-evidence
+          path: evidence/
+          retention-days: 1
