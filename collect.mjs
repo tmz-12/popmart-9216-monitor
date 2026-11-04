@@ -55,6 +55,9 @@ export async function collect(id='9216') {
     if(!stable) throw Error('UNSTABLE_STORE_LIST');
     const text=await dialog.innerText();
     if(!second.length && !text.includes('This item is currently unavailable for Store Pickup')) throw Error('EMPTY_UNKNOWN_STORE_LIST');
+    // The checked, stable availability filter is authoritative even when badges
+    // are CSS-generated and absent from innerText. Absent listed stores are unavailable.
+    for(const row of allRows) output.observations[key(row.text)]='sold_out';
     for(const row of second) {
       if(row.disabled || /\b(Not Sold|Out of stock)\b/i.test(row.text)) continue;
       const k=key(row.text);
