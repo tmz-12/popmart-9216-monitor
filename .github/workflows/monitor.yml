@@ -1,5 +1,7 @@
 name: POP MART 9216 stock monitor
 on:
+  schedule:
+    - cron: '2-59/5 * * * *'
   workflow_dispatch:
     inputs:
       validate_only:
@@ -18,7 +20,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   monitor:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v6
@@ -41,4 +43,6 @@ jobs:
           name: stock-observation
           path: evidence/
           retention-days: 1
+
+
 
