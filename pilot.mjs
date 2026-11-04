@@ -25,7 +25,8 @@ try {
       if(await reject.isVisible()) await reject.click();
       // Allow client-side inventory to hydrate; do not treat initial empty UI as no stock.
       await page.waitForTimeout(6000);
-      const dialog=page.getByRole('dialog');
+      if(await reject.isVisible()) await reject.click();
+      const dialog=page.getByRole('dialog').filter({hasText:'Select Your Store for Pickup'});
       if(await dialog.count()===1 && await dialog.isVisible()) {
         const close=dialog.getByRole('button',{name:'Close',exact:true});
         if(await close.isVisible()) await close.click();
@@ -68,3 +69,4 @@ try {
   await writeFile('evidence/result.json',JSON.stringify(results,null,2));
   console.log(JSON.stringify(results.map(({product_id,online,pickup,pageRead})=>({product_id,online,pickup,pageRead}))));
 }
+
