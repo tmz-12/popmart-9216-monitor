@@ -1,5 +1,9 @@
 # POP MART 9216 US stock monitor
 
+> 2026-11-05 reliability audit: the five-minute cron is configured, but the first overnight window produced only three scheduled runs, at 20:49 UTC Nov 4, 01:06 and 07:51 UTC Nov 5; one failed. This is **not verified reliable five-minute monitoring**. The latest successful observation at 07:52 UTC found 101 unavailable stores. See Actions for actual times. A separate reliable scheduler is still needed if the five-minute requirement is strict.
+
+> 中文：已接通真实库存与 ntfy，但昨晚只自动触发三次，不能称为已实现可靠的五分钟监控。请以 Actions 实际运行时间为准。11月5日的修正等待门店弹窗完全关闭，并等待门店列表稳定，避免动画期间误读为空列表。
+
 Reads the real public US product page and its store pickup selector. No mock inventory, private API replay, sign-in, purchase automation or access-control bypass. Product 3317 is an optional validation reference only; live mode always uses 9216.
 
 ## 使用方法 / How to use

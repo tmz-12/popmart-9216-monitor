@@ -23,7 +23,10 @@ export async function collect(id='9216') {
     const reject=page.getByRole('button',{name:'Reject All',exact:true});
     if(await reject.isVisible()) await reject.click();
     const dialog=page.getByRole('dialog').filter({hasText:'Select Your Store for Pickup'});
-    if(await dialog.isVisible()) await dialog.getByRole('button',{name:'Close',exact:true}).click();
+    if(await dialog.isVisible()) {
+      await dialog.getByRole('button',{name:'Close',exact:true}).click();
+      await dialog.waitFor({state:'hidden'});
+    }
     output.observations.online='unknown';
     if(await ready('Deliver To Home')) {
       await page.getByRole('button',{name:'Deliver To Home',exact:true}).click();
@@ -42,9 +45,16 @@ export async function collect(id='9216') {
     await dialog.waitFor({state:'visible'});
     const filter=dialog.getByRole('switch',{name:'Only Show In-stock Stores',exact:true});
     await filter.setChecked(false);
-    await page.waitForTimeout(3000);
     const rows=async()=>dialog.getByRole('button').evaluateAll(es=>es.map(e=>({text:e.innerText.trim(),disabled:e.disabled || e.getAttribute('aria-disabled')==='true'})).filter(e=>e.text.split('\n').filter(Boolean).length>=2));
-    const allRows=await rows();
+    let allRows=[];
+    for(let attempt=0;attempt<10;attempt++) {
+      await dialog.waitFor({state:'visible'});
+      await page.waitForTimeout(2000);
+      const candidate=await rows();
+      if(candidate.length && JSON.stringify(candidate)===JSON.stringify(allRows)) break;
+      allRows=candidate;
+      if(attempt===9) throw Error('UNSTABLE_ALL_STORE_LIST');
+    }
     if(!allRows.length) throw Error('NO_STORE_ROWS');
     const key=text=>'pickup:'+text.split('\n').map(x=>x.trim()).filter(x=>x && !/^(Not Sold|Out of stock|In stock)$/i.test(x)).join(' | ');
     for(const row of allRows) output.observations[key(row.text)]=/\b(Not Sold|Out of stock)\b/i.test(row.text)?'sold_out':'unknown';
@@ -54,7 +64,7 @@ export async function collect(id='9216') {
     const first=await rows();
     await page.waitForTimeout(2000);
     const second=await rows();
-    const stable=JSON.stringify(first)===JSON.stringify(second);
+    const stable=await dialog.isVisible() && await filter.isChecked() && JSON.stringify(first)===JSON.stringify(second);
     if(!stable) throw Error('UNSTABLE_STORE_LIST');
     const text=await dialog.innerText();
     if(!second.length && !text.includes('This item is currently unavailable for Store Pickup')) throw Error('EMPTY_UNKNOWN_STORE_LIST');
