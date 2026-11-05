@@ -29,6 +29,8 @@ The early readability pilot encountered a cookie/pickup dialog selector ambiguit
 
 ## State and failure behavior
 
+State saves now make up to three write attempts, waiting 2 then 5 seconds. Before each write, the current remote bytes and blob SHA are checked. If a failed response actually committed the intended state, the next read acknowledges it without writing again. Different externally updated state is never overwritten. After the final ambiguous write, one final read checks whether it committed. Exhausted retries still fail visibly in Actions; no failure or recovery notification is sent to ntfy. Transient initial reads also retry. This improves recovery from GitHub 500/502 and network failures but does not fix missed scheduler triggers or guarantee exactly-once delivery.
+
 The `monitor-state` branch stores `monitor-state.json`, including per-store known status, successful notification IDs and `last_success_at`. No credentials are stored there. A failed or ambiguous read does not reset deduplication. A failed send is retried on a later scheduled observation if stock remains available. An acknowledgement followed by a failed state save may cause a duplicate; exactly-once phone delivery cannot be guaranteed.
 
 The collector checks the current page's full store list without a specific location filter. This covers stores exposed by that US page, not an independently verified list of every physical store. A checked in-stock filter and enabled store row is availability evidence, not a reservation or purchase guarantee.

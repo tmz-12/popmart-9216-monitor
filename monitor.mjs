@@ -1,6 +1,7 @@
 import {mkdir,writeFile,appendFile} from 'node:fs/promises';
 import {collect} from './collect.mjs';
 import {mergeObservation} from './stock-policy.mjs';
+import {retryRead,saveState} from './state-store.mjs';
 await mkdir('evidence',{recursive:true});
 const validate=process.env.VALIDATE_ONLY!=='false';
 const id=validate ? (process.env.PRODUCT_ID || '9216') : '9216';
@@ -17,23 +18,25 @@ const repo=process.env.GITHUB_REPOSITORY;
 if(!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repo || '') || !process.env.GITHUB_TOKEN) throw Error('STATE_CONFIG_MISSING');
 const base=`https://api.github.com/repos/${repo}`;
 async function api(path,method='GET',body) {
-  const response=await fetch(base+path,{method,headers:{Authorization:`Bearer ${process.env.GITHUB_TOKEN}`,Accept:'application/vnd.github+json','Content-Type':'application/json'},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(15000)});
+  let response;
+  try {
+    response=await fetch(base+path,{method,headers:{Authorization:`Bearer ${process.env.GITHUB_TOKEN}`,Accept:'application/vnd.github+json','Content-Type':'application/json'},body:body?JSON.stringify(body):undefined,signal:AbortSignal.timeout(10000)});
+  } catch {throw Object.assign(Error('STATE_NETWORK_ERROR'),{retryable:true});}
   if(response.status===404 && method==='GET') return null;
-  if(!response.ok) throw Error(`STATE_HTTP_${response.status}`);
-  return response.json();
+  if(!response.ok) throw Object.assign(Error(`STATE_HTTP_${response.status}`),{status:response.status,retryable:response.status>=500 || response.status===408});
+  try {return await response.json();} catch {throw Object.assign(Error('STATE_RESPONSE_INVALID'),{retryable:true});}
 }
-if(!await api('/git/ref/heads/monitor-state')) {
-  const main=await api('/git/ref/heads/main');
+if(!await retryRead(()=>api('/git/ref/heads/monitor-state'))) {
+  const main=await retryRead(()=>api('/git/ref/heads/main'));
   if(!main) throw Error('MAIN_BRANCH_MISSING');
   await api('/git/refs','POST',{ref:'refs/heads/monitor-state',sha:main.object.sha});
 }
-let file=await api('/contents/monitor-state.json?ref=monitor-state');
+let file=await retryRead(()=>api('/contents/monitor-state.json?ref=monitor-state'));
 const previous=file ? JSON.parse(Buffer.from(file.content,'base64').toString('utf8')) : null;
 const {state,alerts}=mergeObservation(previous,result.observations);
 async function save() {
   state.last_success_at=result.checked_at;
-  const saved=await api('/contents/monitor-state.json','PUT',{message:'Record real inventory observation',branch:'monitor-state',content:Buffer.from(JSON.stringify(state,null,2)).toString('base64'),...(file?{sha:file.sha}:{})});
-  file=saved.content;
+  file=await saveState({api,state,file});
 }
 // Verify persistence works before attempting any notification.
 await save();
