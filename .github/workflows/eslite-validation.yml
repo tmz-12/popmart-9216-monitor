@@ -1,0 +1,27 @@
+name: Eslite cloud validation
+on:
+  push:
+    branches: [main]
+    paths: ['eslite-*.mjs', '.github/workflows/eslite-validation.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+      - run: npm ci
+      - run: node --test eslite-policy.test.mjs
+      - run: npx playwright install chromium
+      - run: node eslite-validate.mjs
+      - uses: actions/upload-artifact@v5
+        if: always()
+        with:
+          name: eslite-validation
+          path: evidence/eslite/
+          retention-days: 3
