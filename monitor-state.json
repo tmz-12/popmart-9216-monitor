@@ -102,8 +102,9 @@
     "pickup:Arundel Mills | 7000 Arundel Mills Cir, Hanover, MD 21076": "sold_out",
     "pickup:Potomac Mills | 2700 Potomac Mills Cir, Woodbridge, VA 22192": "sold_out",
     "pickup:Crabtree Valley | 4325 Glenwood Ave, Raleigh, NC 27612": "sold_out",
-    "pickup:Baybrook | 500 Baybrook Mall, Friendswood, TX 77546": "sold_out"
+    "pickup:Baybrook | 500 Baybrook Mall, Friendswood, TX 77546": "sold_out",
+    "pickup:Streets at Southpoint | 6910 Fayetteville Rd Suite 280 Durham, NC 27713": "sold_out"
   },
   "notified": {},
-  "last_success_at": "2026-11-09T03:20:42.961Z"
+  "last_success_at": "2026-11-09T03:25:37.203Z"
 }
