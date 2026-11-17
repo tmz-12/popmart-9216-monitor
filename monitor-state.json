@@ -103,8 +103,9 @@
     "pickup:Potomac Mills | 2700 Potomac Mills Cir, Woodbridge, VA 22192": "sold_out",
     "pickup:Crabtree Valley | 4325 Glenwood Ave, Raleigh, NC 27612": "sold_out",
     "pickup:Baybrook | 500 Baybrook Mall, Friendswood, TX 77546": "sold_out",
-    "pickup:Streets at Southpoint | 6910 Fayetteville Rd Suite 280 Durham, NC 27713": "sold_out"
+    "pickup:Streets at Southpoint | 6910 Fayetteville Rd Suite 280 Durham, NC 27713": "sold_out",
+    "pickup:Jordan Creek Town | 101 Jordan Creek Pkwy, Suite 11012 West Des Moines, IA 50266": "sold_out"
   },
   "notified": {},
-  "last_success_at": "2026-11-17T09:30:53.869Z"
+  "last_success_at": "2026-11-17T09:35:38.905Z"
 }
