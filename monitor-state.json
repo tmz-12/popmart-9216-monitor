@@ -104,8 +104,11 @@
     "pickup:Crabtree Valley | 4325 Glenwood Ave, Raleigh, NC 27612": "sold_out",
     "pickup:Baybrook | 500 Baybrook Mall, Friendswood, TX 77546": "sold_out",
     "pickup:Streets at Southpoint | 6910 Fayetteville Rd Suite 280 Durham, NC 27713": "sold_out",
-    "pickup:Jordan Creek Town | 101 Jordan Creek Pkwy, Suite 11012 West Des Moines, IA 50266": "sold_out"
+    "pickup:Jordan Creek Town | 101 Jordan Creek Pkwy, Suite 11012 West Des Moines, IA 50266": "sold_out",
+    "pickup:Brea | 2015 Brea Mall, Brea, CA 92821": "sold_out",
+    "pickup:Walt Whitman | Suite #1002A 160 Walt Whitman Rd Huntington Station, NY 11746": "sold_out",
+    "pickup:Orlando Premium | 4951 International Dr, Orlando, FL 32819": "sold_out"
   },
   "notified": {},
-  "last_success_at": "2026-11-23T07:31:02.926Z"
+  "last_success_at": "2026-11-23T07:35:33.536Z"
 }
